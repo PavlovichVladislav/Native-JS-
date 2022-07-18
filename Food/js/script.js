@@ -153,3 +153,67 @@ window.addEventListener('DOMContentLoaded', () => {
 
     modalTimer = setTimeout(() => {openModal(modalWindow)}, 5000);
 })
+
+// menu cards
+
+const menyArray = [
+    {
+        img: 'img/tabs/vegy.jpg',
+        alt: 'vegy',
+        title: 'Меню "Фитнес"',
+        descr: `Меню "Фитнес" - это новый подход к приготовлению блюд: больше 
+                свежих овощей и фруктов. Продукт активных и здоровых людей. Это 
+                абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
+        cost: 229,
+    },
+    {
+        img: "img/tabs/elite.jpg",
+        alt: 'elite',
+        title: 'Меню “Премиум”',
+        descr: `В меню “Премиум” мы используем не только красивый дизайн упаковки, 
+                но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - 
+                ресторанное меню без похода в ресторан!`,
+        cost: 550,
+    },
+    {
+        img: "img/tabs/post.jpg",
+        alt: "post",
+        title: 'Меню "Постное"', 
+        descr: `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие 
+                продуктов животного происхождения, молоко из миндаля, овса, кокоса или 
+                гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
+        cost: 430
+    },
+]
+
+class MenuCard {
+    constructor({img, alt, title, descr, cost}) {
+        this.img = img;
+        this.alt = alt;
+        this.title = title;
+        this.descr = descr;
+        this.cost = cost;
+    }
+
+    createCard() {
+        const div = document.createElement('div');
+        div.classList.add('menu__item');
+        div.innerHTML = `
+            <img src=${this.img} alt=${this.alt}>
+            <h3 class="menu__item-subtitle">${this.title}</h3>
+            <div class="menu__item-descr">${this.descr}</div>
+            <div class="menu__item-divider"></div>
+            <div class="menu__item-price">
+                <div class="menu__item-cost">Цена:</div>
+                <div class="menu__item-total"><span>${this.cost}</span> грн/день</div>
+            </div>
+        `
+        return div;  
+    }
+}
+
+const menuContainer = document.querySelector('.menu__field .container');
+
+menyArray.forEach(item => {
+    menuContainer.append(new MenuCard(item).createCard());
+})
