@@ -155,67 +155,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // menu cards
 
-const menyArray = [
-    {
-        img: 'img/tabs/vegy.jpg',
-        alt: 'vegy',
-        title: 'Меню "Фитнес"',
-        descr: `Меню "Фитнес" - это новый подход к приготовлению блюд: больше 
-                свежих овощей и фруктов. Продукт активных и здоровых людей. Это 
-                абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
-        cost: 229,
-    },
-    {
-        img: "img/tabs/elite.jpg",
-        alt: 'elite',
-        title: 'Меню “Премиум”',
-        descr: `В меню “Премиум” мы используем не только красивый дизайн упаковки, 
-                но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - 
-                ресторанное меню без похода в ресторан!`,
-        cost: 550,
-    },
-    {
-        img: "img/tabs/post.jpg",
-        alt: "post",
-        title: 'Меню "Постное"', 
-        descr: `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие 
-                продуктов животного происхождения, молоко из миндаля, овса, кокоса или 
-                гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
-        cost: 430
-    },
-]
+    const getData = async (url) => {
+        const res = await fetch(url);
 
-class MenuCard {
-    constructor({img, alt, title, descr, cost}) {
-        this.img = img;
-        this.alt = alt;
-        this.title = title;
-        this.descr = descr;
-        this.cost = cost;
-    }
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+            
+        }
 
-    createCard() {
+        return await res.json();
+    };
+
+    function createCard({img, altimg, title, descr, price}) {
         const div = document.createElement('div');
-        div.classList.add('menu__item');
-        div.innerHTML = `
-            <img src=${this.img} alt=${this.alt}>
-            <h3 class="menu__item-subtitle">${this.title}</h3>
-            <div class="menu__item-descr">${this.descr}</div>
-            <div class="menu__item-divider"></div>
-            <div class="menu__item-price">
-                <div class="menu__item-cost">Цена:</div>
-                <div class="menu__item-total"><span>${this.cost}</span> грн/день</div>
-            </div>
-        `
-        return div;  
+            div.classList.add('menu__item');
+            div.innerHTML = `
+                <img src=${img} alt=${altimg}>
+                <h3 class="menu__item-subtitle">${title}</h3>
+                <div class="menu__item-descr">${descr}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${price}</span> грн/день</div>
+                </div>
+            `
+        return div;
     }
-}
 
     const menuContainer = document.querySelector('.menu__field .container');
 
-    menyArray.forEach(item => {
-        menuContainer.append(new MenuCard(item).createCard());
-    })
+    getData('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(obj => {
+                menuContainer.append(createCard(obj)); 
+            });
+        });
+    
     
     // Forms 
 
@@ -227,7 +202,19 @@ class MenuCard {
         failure: 'Что - то пошло не так...',
     }
 
-    function postData(form) {
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: "POST",
+            body:  data,
+            headers: {
+                'Content-type': 'application/json;charset=utf-8',
+            }
+        });
+
+        return await res.json();
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
            
@@ -238,18 +225,12 @@ class MenuCard {
             
             const formData = new FormData(form);
 
-            const object = {};
-            formData.forEach(function(value, key){
-                object[key] = value;
-            });
+            console.log(formData.entries());
+            console.log(Object.fromEntries(formData.entries()));
 
-            fetch('server1.php',{
-                method: "POST",
-                body:  JSON.stringify(object),
-                headers: {
-                    'Content-type': 'application/json',
-                }
-            }).then(data => data.text())
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+            postData('http://localhost:3000/requests', json)
             .then(response => {
                 console.log(response);
                 showNoticeModal(message.success);
@@ -287,7 +268,8 @@ class MenuCard {
     }
 
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     })
+
 })
 
