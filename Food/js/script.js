@@ -151,7 +151,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    modalTimer = setTimeout(() => {openModal(modalWindow)}, 5000);
+    // modalTimer = setTimeout(() => {openModal(modalWindow)}, 5000);
 
     // menu cards
 
@@ -271,5 +271,63 @@ window.addEventListener('DOMContentLoaded', () => {
         bindPostData(item);
     })
 
+    // slider
+
+    const prevSlide = document.querySelector('.offer__slider-prev'),
+          nextSlide = document.querySelector('.offer__slider-next'),
+          currentSlide = document.querySelector('#current'),
+          totalSlides = document.querySelector('#total'),
+          slider = document.querySelector('.offer__slider-wrapper');
+          slides = document.querySelector('.offer__slider-inner');
+          slidesCount = document.querySelectorAll('.offer__slide').length;
+
+    let slideIndex = 1;
+    currentSlide.textContent = `0${slideIndex}`;
+
+    const navigate = document.createElement('ul');
+    navigate.classList.add('offer__navigate');
+
+    for (let i = 0; i < slidesCount; i++) {
+        const dot = document.createElement('li');
+        dot.classList.add('dot');
+        dot.addEventListener('click', () => {slideIndex = i+1; showSlide(slideIndex)});
+        navigate.appendChild(dot);
+    }
+    
+    navigate.children[0].style.opacity = 1;
+    slider.appendChild(navigate);
+
+    showSlide = index => {
+        if (index < 1) {
+            slideIndex = slidesCount;
+        }
+
+        if (index > slidesCount) {
+            slideIndex = 1;
+        }
+
+        slides.style.transform = `translateX(-${(slideIndex-1)*100}%)`;
+
+        if (slideIndex < 10) {
+            currentSlide.textContent = `0${slideIndex}`;
+        } else {
+            currentSlide.textContent = `${slideIndex}`;
+        }
+
+        for (li of navigate.children) {
+            li.style.opacity = 0.6;
+        }
+
+        navigate.children[slideIndex-1].style.opacity = 1;
+    }
+
+    if (slidesCount < 10) {
+        totalSlides.textContent = `0${slidesCount}`;
+    } else {
+        totalSlides.textContent = `${slidesCount}`;
+    }
+
+    nextSlide.addEventListener('click', () => {showSlide(++slideIndex)})
+    prevSlide.addEventListener('click', () => {showSlide(--slideIndex)})
 })
 
